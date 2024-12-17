@@ -29,11 +29,11 @@ const User = sequelize.define('Users', {
     timestamps: false,   
 });
 
-// async function syncModel() {
-//     await sequelize.sync();
-//     console.log("Users table has been created or synchronized");
-// }
+async function syncModel() {
+    await sequelize.sync();
+    console.log("Users table has been created or synchronized");
+}
 
-// syncModel();
+syncModel();
 
 module.exports = User;

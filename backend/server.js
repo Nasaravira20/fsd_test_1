@@ -1,8 +1,12 @@
 const express = require('express');
 const db = require('./db');
 
+
 const app = express();
 app.use(express.json());
+var cors = require('cors');
+app.use(cors());
+app.options('*', cors());
 app.use(express.urlencoded({extended:true}));
 
 const users = require('./Routes/User')

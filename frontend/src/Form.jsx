@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const Form = () => {
+  const [log,setlog] = useState('');
+  // const [submitted, setsubmitted] = useState(false);
   const [formData, setFormData] = useState({
     firstname: '',
     lastname: '',
+    employee_id:'',
     email: '',
     number: '',
     department: '',
@@ -14,6 +17,7 @@ const Form = () => {
   const [errors, setErrors] = useState({
     firstname: false,
     lastname: false,
+    employee_id: false,
     email: false,
     number: false,
     department: false,
@@ -51,6 +55,10 @@ const Form = () => {
       validationErrors.lastname = 'Last Name is required.';
     }
 
+    if (!/^\S{10}$/.test(formData.employee_id)) {
+      validationErrors.employee_id = 'Valid 10-char empid is required is required.';
+    }
+
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
       validationErrors.email = 'Valid Email is required.';
     }
@@ -77,9 +85,11 @@ const Form = () => {
       try {
         const response = await axios.post('http://localhost:3000/api/employee/add', formData);
         console.log('Form submitted successfully', response);
+alert('form submitted successfully');
         setFormData({
           firstname: '',
           lastname: '',
+          employee_id: '',
           email: '',
           number: '',
           department: '',
@@ -88,7 +98,9 @@ const Form = () => {
         });
         setErrors({});
       } catch (error) {
-        console.error(`Error submitting form:', ${error}`);
+        console.log(error.response.data.user);
+        alert(error.response.data.msg);
+        // setlog(error);
       } finally {
         setIsSubmitting(false);
       }
@@ -96,9 +108,11 @@ const Form = () => {
   };
 
   const handleReset = () => {
+    setlog('');
     setFormData({
       firstname: '',
       lastname: '',
+      employee_id: '',
       email: '',
       number: '',
       department: '',
@@ -112,6 +126,7 @@ const Form = () => {
     <main>
       <section className="bg-gray-50 dark:bg-gray-900">
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+          <p>{log}</p>
           <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
@@ -160,6 +175,26 @@ const Form = () => {
 
                 <div>
                   <label
+                    htmlFor="empid"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Employee ID
+                  </label>
+                  <input
+                    type="text"
+                    name="employee_id"
+                    id="empid"
+                    className={`bg-gray-50 border ${errors.employee_id ? 'border-red-500' : 'border-gray-300'} text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                    placeholder="employee85"
+                    value={formData.employee_id}
+                    onChange={handleChange}
+                    required
+                  />
+                  {errors.employee_id && <p className="text-red-500 text-xs mt-1">{errors.employee_id}</p>}
+                </div>
+
+                <div>
+                  <label
                     htmlFor="email"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
@@ -185,17 +220,19 @@ const Form = () => {
                   >
                     Phone Number
                   </label>
-                  <input
-                    type="tel"
-                    name="number"
-                    id="number"
-                    className={`bg-gray-50 border ${errors.number ? 'border-red-500' : 'border-gray-300'} text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
-                    placeholder="8520741046"
-                    value={formData.number}
-                    onChange={handleChange}
-                    required
-                  />
-                  {errors.number && <p className="text-red-500 text-xs mt-1">{errors.number}</p>}
+                  <div className="flex">
+                    
+                    <input
+                      type="tel"
+                      name="number"
+                      id="number"
+                      className={`bg-gray-50 border ${errors.number ? 'border-red-500' : 'border-gray-300'} text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                      placeholder="8520741046"
+                      value={formData.number}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>            {errors.number && <p className="text-red-500 text-xs mt-1">{errors.number}</p>}
                 </div>
 
                 <div>
