@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Form = () => {
+  const navigate = useNavigate();
   const [log,setlog] = useState('');
+  const [isEditing,setIsEditing] = useState(false);
   // const [submitted, setsubmitted] = useState(false);
   const [formData, setFormData] = useState({
     firstname: '',
@@ -25,6 +28,30 @@ const Form = () => {
     role: false
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  useEffect(() => {
+    
+      console.log('employee not found')
+      const localData = JSON.parse(localStorage.getItem("employeeData"));
+      
+      // console.log(localData);
+      if (localData) {
+        // const localData = Data[0];
+        // setFormData(JSON.parse(localData));
+        setFormData({
+          firstname: localData.firstname || "",
+          lastname: localData.lastname || "",
+          employee_id: localData.employee_id || "",
+          email: localData.email || "",
+          number: localData.phone_number || "",
+          department: localData.department || "",
+          dateOfJoining: localData.dateOfJoining || "",
+          role: localData.role || "",
+        });
+        console.log(localData);
+        setIsEditing(true);
+    }else { console.log('no data found')}
+  
+  }, [location.state]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -83,9 +110,27 @@ const Form = () => {
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
       try {
-        const response = await axios.post('http://localhost:3000/api/employee/add', formData);
-        console.log('Form submitted successfully', response);
-alert('form submitted successfully');
+        if (isEditing)
+        {
+          const response = await axios.put('http://localhost:3000/api/employee/update', formData);
+          
+          console.log(response);
+          alert('employee updated successfully');
+          if (response.status === 200) {
+            localStorage.clear();
+            navigate('/')
+          }
+        }else{
+          const response = await axios.post('http://localhost:3000/api/employee/add', formData);
+          
+          console.log('Employee added to the database successfully', response);
+          alert('Employee added to the database successfully');
+          if (response.status === 201) {
+            // localStorage.clear();
+            navigate('/')
+          }
+        }
+        
         setFormData({
           firstname: '',
           lastname: '',
@@ -194,6 +239,8 @@ alert('form submitted successfully');
                 </div>
 
                 <div>
+                  {!isEditing && 
+                  <>
                   <label
                     htmlFor="email"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -211,6 +258,8 @@ alert('form submitted successfully');
                     required
                   />
                   {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                  </>
+                }
                 </div>
 
                 <div>
@@ -309,7 +358,8 @@ alert('form submitted successfully');
                   className="w-50 mr-20 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Submitting...' : 'Create Employee'}
+                  {isEditing ? "Update Employee" : "Create Employee"}
+
                 </button>
                 <button
                   type="reset"

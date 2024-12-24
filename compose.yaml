@@ -1,0 +1,59 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    networks:
+      - fsd
+    depends_on:
+      - backend
+    volumes:
+      - ./web:/app/web
+      - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf
+    develop:
+      watch:
+        - action: sync
+          path: ./web
+          target: /app/web
+          ignore:
+            - node_modules/
+        - action: sync+restart
+          path: ./proxy/nginx.conf
+          target: /etc/nginx/conf.d/default.conf
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - fsd
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: "postgres://postgres:password@postgres:5432/nimbus"
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: nimbus
+      POSTGRES_PASSWORD: 335555777777
+      POSTGRES_DB: nimbus
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fsd
+
+networks:
+  fsd:
+    driver: bridge
+
+volumes:
+  postgres_data:

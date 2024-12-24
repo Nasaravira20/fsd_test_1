@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('postgres://nimbus:335555777777@localhost:5432/nimbus');
+const sequelize = new Sequelize('postgres://postgres:335555777777@localhost:5432/nimbus');
 
 const Employee = sequelize.define('Employees', {
     id: {

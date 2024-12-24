@@ -1,14 +1,19 @@
-
-const { Sequelize, DataTypes } = require('sequelize');
+// const mongoose = require('mongoose');
+const {Sequelize, DataTypes} = require('sequelize');
 const sequelize = new Sequelize('postgres://postgres:335555777777@localhost:5432/nimbus');
 
-const User = sequelize.define('Users', {
+
+const Admin = sequelize.define('Admin',{
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
     },
-    name: {
+    firstname: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+    },
+    lastname: {
         type: DataTypes.STRING(100),
         allowNull: false,
     },
@@ -20,20 +25,17 @@ const User = sequelize.define('Users', {
             isEmail: true,
         },
     },
-    createdat: {
-        type: DataTypes.DATE,
-        defaultValue: Sequelize.NOW,
-    }
-}, {
-    tableName: 'users',  
-    timestamps: false,   
+    password: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+        },
 });
 
 async function syncModel() {
     await sequelize.sync();
-    console.log("Users table has been created or synchronized");
+    console.log('admin created successfully')
 }
-
 syncModel();
 
-module.exports = User;
+// module.exports = mongoose.model('Admin', adminSchema);
+module.exports = Admin;
